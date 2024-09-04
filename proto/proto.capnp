@@ -1,65 +1,80 @@
 @0xfaf73f229639ac2c;
 
-const version = 10001;
+const version :Int64 = 10001;
 
 struct FileTar {
     version @0 :Int64 = .version;
+    # schema version
 
-    pack_id @1 :Int64;
+    packId @1 :Int64;
+    # increasing number
 
     changes @2 :List(FileChange);
 }
 
 struct FileChange {
-    status @0 :Status;
+    id @0 :Int64;
 
-    meta @1 :FileMeta;
+    status @1 :Status;
+
+    meta @2 :FileMeta;
 
     union {
-        blocks :List(FileBlock) = @2;
-        empty :Void = @3;
+        blocks @3 :List(FileBlock);
+        empty @4 :Void;
     }
 
     enum Status {
-        updated = 0;
-        deteled = 1;
+        updated @0;
+        deteled @1;
     }
 
     struct FileMeta {
         path @0 :Text;
-        create_time @1 :Int64;
-        update_time @2 :Int64;
+        createTime @1 :Int64;
+        updateTime @2 :Int64;
         hash @3 :Hash;
-
-
     }
     
     struct FileBlock {
-        block_id @0 :Text;
+        blockId @0 :Text;
         offset @1 :UInt64;
         size @2 :UInt64;
     }
 }
 
 struct Block {
-    block_id @0 :Text;
-    block_kind @1 :Kind;
+    blockId @0 :Text;
+    # encode with hex chars
+
+    blockKind @1 :Kind;
+
     meta @2 :Meta;
 
+    encrypt @3 :Encrypt;
+
     union {
-        sublocks @3 :List(Sublock);
-        nonsublocks @4 :Void;
+        sublocks @4 :List(Sublock);
+
+        nonSublocks @5 :Void;
+        # for `full` kind block
     }
 
     enum Kind {
-        full = 0;
-        compact = 1;
-        aggregated = 2;
+        full @0;
+        # only one sublock
+
+        compact @1;
+        # compact with serval encrypted sublock
+
+        aggregated @2;
+        # sublocks together then encrypted
     }
 
     struct Meta {
         size @0 :UInt64;
-        hash @1 :Hash;
+        blockHash @1 :Hash;
+
     }
 
     struct Sublock {
@@ -73,6 +88,15 @@ struct Hash {
     hash @1 :Data;
 
     enum Method {
-        Sha256 = 0;
+        sha256 @0;
+    }
+}
+
+struct Encrypt {
+    algo @0 :Algo;
+    key @1 :Data;
+
+    enum Algo {
+        aes256Gcm @0;
     }
 }

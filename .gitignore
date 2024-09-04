@@ -155,3 +155,7 @@ rust-project.json
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/rust,rust-analyzer,visualstudiocode,jetbrains
+
+# ignore generated file
+src/pb/*.rs
+!src/pb/mod.rs
